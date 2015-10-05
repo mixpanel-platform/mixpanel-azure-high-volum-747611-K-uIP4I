@@ -51,9 +51,10 @@
           $('#graph').empty();
           var output = {};
           output["Top 10 Events"] = {};
+          console.log("START!");
           
           for (var DAUdate = from_date; DAUdate <= to_date + 1; DAUdate.setDate(DAUdate.getDate() + 1)) {
-            console.log(DAUdate);
+            console.log("DAU DATE = " + DAUdate);
             console.log("MAU DATE Start = " + (DAUdate - 30));
             console.log("MAU DATE End = " + (DAUdate - 1))
             
