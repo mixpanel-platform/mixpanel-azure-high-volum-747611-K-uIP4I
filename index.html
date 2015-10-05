@@ -48,7 +48,7 @@
               date = $("#slider").dateRangeSlider("values"),
               eventName = '$custom_event:87021';
           
-          for (var d = from_date; d <= to_date; d.setDate(d.getDate() + 1)) {
+          for (var d = from_date; d <= to_date + 1; d.setDate(d.getDate() + 1)) {
             console.log(d);
           }    
               eventName = false;
