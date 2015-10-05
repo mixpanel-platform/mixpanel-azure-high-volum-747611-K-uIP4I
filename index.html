@@ -31,7 +31,7 @@
             return month + "/" + days + "/" + year;},
           bounds:{min: moment().subtract(182, 'days').toDate(),max: moment().toDate()},
           defaultValues:{min: moment().subtract(7, 'days').toDate(),max: moment().toDate()}, //changeback to 30 days
-          range:{min: {days: 7},max: {days: 100}}
+          range:{min: {days: 1},max: {days: 100}} //{days: 7}
         });
         
         
@@ -54,6 +54,7 @@
           console.log("START!");
           
           for (var DAUdate = from_date; DAUdate <= to_date + 1; DAUdate.setDate(DAUdate.getDate() + 1)) {
+            console.log("DATE 1")
             console.log("DAU DATE = " + DAUdate);
             console.log("MAU DATE Start = " + (DAUdate - 30));
             console.log("MAU DATE End = " + (DAUdate - 1))
