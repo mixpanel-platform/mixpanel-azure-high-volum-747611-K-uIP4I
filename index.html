@@ -35,17 +35,10 @@
         });
         
         
-        //find interval for bar chart 'interval' param
-        getInterval = function(dates) {
-          intervalDays = Math.ceil((dates.max - dates.min) / (24 * 60 * 60 * 1000)) + 1
-          return intervalDays
-        }
-        
         var runQuery = function() {
           //obtain event, property, and date range 
           var from_date = $('#slider').dateRangeSlider("values").min,
               to_date = $('#slider').dateRangeSlider("values").max,
-              //date = $("#slider").dateRangeSlider("values"),
               eventName = '$custom_event:87021';
           
           $('#graph').empty();
@@ -53,11 +46,12 @@
           output["Top 10 Events"] = {};
           console.log("START!");
           
-          for (var DAUdate = from_date; DAUdate <= to_date + 1; DAUdate.setDate(DAUdate.getDate() + 1)) {
+          for (var d = from_date; d <= to_date + 1; d.setDate(d.getDate() + 1)) {
+            var DAUdate = d;
             console.log("DATE 1")
-            console.log("DAU DATE = " + DAUdate);
-            console.log("MAU DATE Start = " + (DAUdate - 30));
-            console.log("MAU DATE End = " + (DAUdate - 1))
+            console.log("DAU DATE = " + d);
+            console.log("MAU DATE Start = " + (d - 30));
+            console.log("MAU DATE End = " + (d - 1))
             
             var dauParams = $.extend({}, {
               'from': moment(DAUdate).format('YYYY-MM-DD'),
