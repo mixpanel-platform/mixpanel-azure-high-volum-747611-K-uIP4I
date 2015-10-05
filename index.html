@@ -30,7 +30,7 @@
           formatter:function(val){var days = val.getDate(), month = val.getMonth() + 1, year = val.getFullYear();
             return month + "/" + days + "/" + year;},
           bounds:{min: moment().subtract(182, 'days').toDate(),max: moment().toDate()},
-          defaultValues:{min: moment().subtract(30, 'days').toDate(),max: moment().toDate()},
+          defaultValues:{min: moment().subtract(7, 'days').toDate(),max: moment().toDate()}, //changeback to 30 days
           range:{min: {days: 7},max: {days: 100}}
         });
         
@@ -45,110 +45,55 @@
           //obtain event, property, and date range 
           var from_date = $('#slider').dateRangeSlider("values").min,
               to_date = $('#slider').dateRangeSlider("values").max,
-              date = $("#slider").dateRangeSlider("values"),
+              //date = $("#slider").dateRangeSlider("values"),
               eventName = '$custom_event:87021';
           
-          for (var d = from_date; d <= to_date + 1; d.setDate(d.getDate() + 1)) {
-            console.log(d);
-          }    
-          console.log('DONE!')
-              eventName = false;
-              propName = false;
-
-          if (eventName) {
-            $('#graph').empty();
-            // Run if property selected
-            if (propName) {
-              var dauParams = $.extend({}, {
-                'from': moment(from_date).format('YYYY-MM-DD'),
-                'to':  moment(to_date).format('YYYY-MM-DD'),
-                'type': 'unique',
-                'unit': 'day',
-                'on': 'properties[\"' + propName + '\"]'
-              });
-              var mauParams = $.extend({}, {
-                'from': moment(from_date).format('YYYY-MM-DD'),
-                'to':  moment(to_date).format('YYYY-MM-DD'),
-                'interval': getInterval(date),
-                'type': 'unique',
-                'on': 'properties[\"' + propName + '\"]'
-              });
-              var $dau = MP.api.segment(eventName, dauParams);
-              var $mau = MP.api.segment(eventName, mauParams);
+          $('#graph').empty();
+          var output = {};
+          output["Top 10 Events"] = {};
+          
+          for (var DAUdate = from_date; DAUdate <= to_date + 1; DAUdate.setDate(DAUdate.getDate() + 1)) {
+            console.log(DAUdate);
+            console.log("MAU DATE Start = " + (DAUdate - 30));
+            console.log("MAU DATE End = " + (DAUdate - 1))
+            
+            var dauParams = $.extend({}, {
+              'from': moment(DAUdate).format('YYYY-MM-DD'),
+              'to':  moment(DAUdate).format('YYYY-MM-DD'),
+              'type': 'unique',
+              'unit': 'day',
+            });
+            var mauParams = $.extend({}, {
+              'from': moment(from_date).format('YYYY-MM-DD'),
+              'to':  moment(to_date).format('YYYY-MM-DD'),
+              'interval': 30,
+              'type': 'unique',
+              'on': 'properties[\"' + propName + '\"]'
+            });
+            var $dau = MP.api.segment(eventName, dauParams);
+            var $mau = MP.api.segment(eventName, mauParams);
               
-              // Wait until the segmentation queries finish
-              $.when($dau, $mau).done(function(dau, mau) {
-                var output = {};
-                var dauQuery = dau.values();
-                var mauQuery = mau.values();
-
-                _.each(_.keys(dauQuery), function(property){
-                  var json = dauQuery[property];
-                  output[property] = {};
-                  
-                  // Calculating MAU
-                  var sum = 0;
-                  var objToSum = mauQuery[property];
-                  _.each(_.keys(objToSum), function(dates){
-                    var values = objToSum[dates];
-                    sum = sum + values;
-                  });
-                  if (sum == 0) {sum = 1}; 
-
-                  // Calculating DAU over MAU
-                  _.each(_.keys(json), function(date){
-                    var value = json[date];
-                    output[property][date] = value/sum;
-                  });
-                });
-                // Log and graph results
-                console.log(output)
-                eventGraph.MPChart('setData', output);
-                });
-            } 
-            // Run if only event selected
-            else if (propName) {
-              var dauParams = $.extend({}, {
-                'from': moment(from_date).format('YYYY-MM-DD'),
-                'to':  moment(to_date).format('YYYY-MM-DD'),
-                'type': 'unique',
-                'unit': 'day',
-              });
-              var mauParams = $.extend({}, {
-                'from': moment(from_date).format('YYYY-MM-DD'),
-                'to':  moment(to_date).format('YYYY-MM-DD'),
-                'interval': getInterval(date),
-                'type': 'unique',
-              });
-              var $dau = MP.api.segment(eventName, dauParams);
-              var $mau = MP.api.segment(eventName, mauParams);
+            // Wait until the segmentation queries finish
+            $.when($dau, $mau).done(function(dau, mau) {
+              var dauQuery = dau.values()[eventName];
+              var mauQuery = mau.values()[eventName];
               
-              // Wait until the segmentation queries finish
-              $.when($dau, $mau).done(function(dau, mau) {
-                var output = {};
-                var dauQuery = dau.values()[eventName];
-                var mauQuery = mau.values()[eventName];
-                output[eventName] = {};
-                
-                // Calculating MAU
-                var sum = 0;
-                _.each(_.keys(mauQuery), function(dates){
-                  var values = mauQuery[dates];
-                  sum = sum + values;
-                });
-                if (sum == 0) {sum = 1}; 
-
-                // Calculating DAU over MAU
-                _.each(_.keys(dauQuery), function(date){
-                  var value = dauQuery[date];
-                  output[eventName][date] = value/sum;
-                });
-                
-                // Log and graph results
-                console.log(output)
-                eventGraph.MPChart('setData', output);
+              // Calculating MAU
+              var sum = 0;
+              _.each(_.keys(mauQuery), function(dates){
+                var values = mauQuery[dates];
+                sum = sum + values;
               });
-            };
+              if (sum == 0) {sum = 1}; 
+              
+              // Calculating DAU over MAU
+              value = dauQuery[DAUdate];
+              output["Top 10 Events"][DAUdate] = value/sum;
+              
+              // Log and graph results
+              console.log(output)
+              eventGraph.MPChart('setData', output);
+            });
           };
         };
         //actions when dropdowns change
