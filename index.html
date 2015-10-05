@@ -30,7 +30,7 @@
           formatter:function(val){var days = val.getDate(), month = val.getMonth() + 1, year = val.getFullYear();
             return month + "/" + days + "/" + year;},
           bounds:{min: moment().subtract(182, 'days').toDate(),max: moment().toDate()},
-          defaultValues:{min: moment().subtract(7, 'days').toDate(),max: moment().toDate()}, //changeback to 30 days
+          defaultValues:{min: moment().subtract(2, 'days').toDate(),max: moment().toDate()}, //changeback to 30 days
           range:{min: {days: 1},max: {days: 100}} //{days: 7}
         });
         
