@@ -13,25 +13,18 @@
   <body class="mixpanel-platform-body">
     <div class="mixpanel-platform-section">
       <div class="titles">
-        <h1 style="font-size: 18px; color: rgb(95,105,131)">Daily Active Users Over Time Period</h1>
+        <h1 style="font-size: 18px; color: rgb(95,105,131)">Daily Active Users Over Time Period for Top 10 Events</h1>
         <p style="font-size: 14px; color: rgb(95,105,131)">Select Date Range</p>
         <div style="clear: both;"></div>
       </div>
       <div class="selectors">
         <div id="slider"></div><br>
         <div style="clear: both;"></div>
-        <p style="font-size: 14px; color: rgb(95,105,131)">Select Active Event (Optional: Select Property to Segment on) </p>
-        <div id="eventSelect" style="float: left;"></div>
-        <div id="by" class="mixpanel-platform-label" style="margin-left: 10px; display: none;">by</div>
-        <div id="propSelect" style="float: left;"></div><br>
-        <div style="clear: both;"></div>
       </div>
       <div id="graph"></div>
     </div>
     <script>
       MP.api.ready(function() {
-        var eventSelect = $('#eventSelect').MPEventSelect();
-        var propSelect  = $('#propSelect').MPPropertySelect();
         var eventGraph  = $('#graph').MPChart({chartType: 'line'});
         $("#slider").dateRangeSlider({
           formatter:function(val){var days = val.getDate(), month = val.getMonth() + 1, year = val.getFullYear();
@@ -50,12 +43,17 @@
         
         var runQuery = function() {
           //obtain event, property, and date range 
-          var eventName = eventSelect.MPEventSelect('value'),
-              propName  = propSelect.MPPropertySelect('value'),
-              from_date = $('#slider').dateRangeSlider("values").min,
+          var from_date = $('#slider').dateRangeSlider("values").min,
               to_date = $('#slider').dateRangeSlider("values").max,
-              date = $("#slider").dateRangeSlider("values");
-              
+              date = $("#slider").dateRangeSlider("values"),
+              eventName = '$custom_event:87021';
+          
+          for (var d = from_date; d <= to_date; d.setDate(d.getDate() + 1)) {
+            console.log(d);
+          }    
+              eventName = false;
+              propName = false;
+
           if (eventName) {
             $('#graph').empty();
             // Run if property selected
@@ -108,7 +106,7 @@
                 });
             } 
             // Run if only event selected
-            else {
+            else if (propName) {
               var dauParams = $.extend({}, {
                 'from': moment(from_date).format('YYYY-MM-DD'),
                 'to':  moment(to_date).format('YYYY-MM-DD'),
@@ -153,12 +151,6 @@
           };
         };
         //actions when dropdowns change
-        eventSelect.on('change', function(e, eventName) {
-          propSelect.MPPropertySelect('setEvent', eventName);
-          $("#by").show();
-          runQuery();
-        });
-        propSelect.on('change', runQuery);
         $("#slider").bind("valuesChanged", runQuery);
       });
     </script>
