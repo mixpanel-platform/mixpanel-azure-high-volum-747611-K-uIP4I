@@ -63,7 +63,6 @@
               'to':  moment(to_date).format('YYYY-MM-DD'),
               'interval': 30,
               'type': 'unique',
-              'on': 'properties[\"' + propName + '\"]'
             });
             var $dau = MP.api.segment(eventName, dauParams);
             var $mau = MP.api.segment(eventName, mauParams);
