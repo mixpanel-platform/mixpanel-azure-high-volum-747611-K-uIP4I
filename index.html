@@ -81,24 +81,27 @@
               var dauQuery = dau.values()[eventName];
               var mauQuery = mau.values()[eventName];
               
-              // Calculating MAU
-              var sum = 0;
-              _.each(_.keys(mauQuery), function(dates){
-                var values = mauQuery[dates];
-                sum = sum + values;
-              });
-              if (sum == 0) {sum = 1}; 
-              
-              // Calculating DAU over MAU
-              debugger;
-              value = dauQuery[dauDate];
-              output["Top 10 Events"][dauDate] = value/sum;
-              
-              // Log and graph results
-              console.log(output)
-              eventGraph.MPChart('setData', output);
+              if (dauQuery) {
+                // Calculating MAU
+                var sum = 0;
+                _.each(_.keys(mauQuery), function(dates){
+                  var values = mauQuery[dates];
+                  sum = sum + values;
+                });
+                if (sum == 0) {sum = 1}; 
+                
+                // Calculating DAU over MAU
+                value = dauQuery[dauDate];
+                output["Top 10 Events"][dauDate] = value/sum;
+              } else {
+                output["Top 10 Events"][dauDate] = 0;
+              };
             });
           };
+              
+          // Log and graph results
+          console.log(output)
+          eventGraph.MPChart('setData', output);
         };
         //actions when dropdowns change
         $("#slider").bind("valuesChanged", runQuery);
