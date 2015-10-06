@@ -47,14 +47,19 @@
           console.log("START!");
           
           for (var d = from_date; d < to_date; d.setDate(d.getDate() + 1)) {
-            var DAUdate = d;
+            var MAUstartDate =  new Date();
+            MAUstartDate.setDate(d.getDate()-30);
+            
+            var MAUendDate =  new Date();
+            MAUendDate.setDate(d.getDate()-1);
+            
             console.log("DAU DATE = " + d);
-            console.log("MAU DATE Start = " + (d.getDate() - 30));
-            console.log("MAU DATE End = " + (d - 1))
+            console.log("MAU DATE Start = " + MAUstartDate);
+            console.log("MAU DATE End = " + MAUendDate);
             
             var dauParams = $.extend({}, {
-              'from': moment(DAUdate).format('YYYY-MM-DD'),
-              'to':  moment(DAUdate).format('YYYY-MM-DD'),
+              'from': moment(d).format('YYYY-MM-DD'),
+              'to':  moment(d).format('YYYY-MM-DD'),
               'type': 'unique',
               'unit': 'day',
             });
