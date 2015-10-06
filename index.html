@@ -47,7 +47,8 @@
           console.log("START!");
           
           for (var d = from_date; d < to_date; d.setDate(d.getDate() + 1)) {
-            output["Top 10 Events"][d] = 0;
+            var dauDate =  moment(d).format('YYYY-MM-DD')
+            output["Top 10 Events"][dauDate] = 0;
             console.log(output);
             var mauStartDate =  new Date();
             mauStartDate.setDate(d.getDate()-30);
@@ -60,8 +61,8 @@
             console.log("MAU DATE End = " + mauEndDate);
             
             var dauParams = $.extend({}, {
-              'from': moment(d).format('YYYY-MM-DD'),
-              'to':  moment(d).format('YYYY-MM-DD'),
+              'from': dauDate,
+              'to':  dauDate,
               'type': 'unique',
               'unit': 'day',
             });
@@ -88,9 +89,8 @@
               if (sum == 0) {sum = 1}; 
               
               // Calculating DAU over MAU
-              console.log(d);
-              value = dauQuery[d];
-              output["Top 10 Events"][d] = value/sum;
+              value = dauQuery[dauDate];
+              output["Top 10 Events"][dauDate] = value/sum;
               
               // Log and graph results
               console.log(output)
