@@ -44,7 +44,9 @@
           $('#graph').empty();
           var output = {};
           output["Top 10 Events"] = {};
+          
           console.log("START!");
+          console.log(output);
           
           for (var d = from_date; d < to_date; d.setDate(d.getDate() + 1)) {
             var dauDate =  moment(d).format('YYYY-MM-DD')
