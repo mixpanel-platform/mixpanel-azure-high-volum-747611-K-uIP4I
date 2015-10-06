@@ -47,8 +47,8 @@
           console.log("START!");
           
           for (var d = from_date; d < to_date; d.setDate(d.getDate() + 1)) {
-            var DAUdate = 
-            
+            output["Top 10 Events"][d] = 0;
+            console.log(output);
             var mauStartDate =  new Date();
             mauStartDate.setDate(d.getDate()-30);
             
@@ -88,7 +88,7 @@
               if (sum == 0) {sum = 1}; 
               
               // Calculating DAU over MAU
-              console.log(d);
+              console.log("d);
               value = dauQuery[d];
               output["Top 10 Events"][d] = value/sum;
               
