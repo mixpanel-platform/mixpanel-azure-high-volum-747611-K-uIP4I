@@ -41,7 +41,7 @@
           
           $('#graph').empty();
           
-          output = {};
+          var output = {};
           output["Top 10 Events"] = {};
           
           var dates = getDates();
@@ -50,7 +50,7 @@
           
           for (var d = dates.from; d < dates.to; d.setDate(d.getDate() + 1)) {
             var dauDate =  moment(d).format('YYYY-MM-DD')
-
+            
             var mauStartDate =  new Date();
             mauStartDate.setDate(d.getDate()-31);
             
@@ -95,10 +95,10 @@
                 // Calculating DAU over MAU
                 value = dauQuery[dauDate];
                 output["Top 10 Events"][dauDate] = value/sum;
-                console.log(output);
+                //console.log(output);
               } else {
                 output["Top 10 Events"][dauDate] = 0;
-                console.log(output);
+                //console.log(output);
               };
             
             });
