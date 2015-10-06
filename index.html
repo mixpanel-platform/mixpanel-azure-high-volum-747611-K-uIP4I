@@ -40,7 +40,8 @@
               eventName = '$custom_event:87021';
           
           $('#graph').empty();
-          var output = {};
+          
+          output = {};
           output["Top 10 Events"] = {};
           
           var dates = getDates();
@@ -94,9 +95,12 @@
                 // Calculating DAU over MAU
                 value = dauQuery[dauDate];
                 output["Top 10 Events"][dauDate] = value/sum;
+                console.log(output);
               } else {
                 output["Top 10 Events"][dauDate] = 0;
+                console.log(output);
               };
+            
             });
           };
               
