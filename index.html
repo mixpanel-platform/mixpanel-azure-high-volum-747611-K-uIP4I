@@ -43,14 +43,12 @@
           var output = {};
           output["Top 10 Events"] = {};
           
+          var dates = getDates();
+          
           console.log("START!");
           console.log(output);
           
-          var dates = getDates();
-          
           for (var d = dates.from; d < dates.to; d.setDate(d.getDate() + 1)) {
-            debugger;
-            console
             var dauDate =  moment(d).format('YYYY-MM-DD')
 
             var mauStartDate =  new Date();
