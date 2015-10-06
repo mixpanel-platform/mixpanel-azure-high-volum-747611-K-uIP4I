@@ -62,14 +62,14 @@
             var dauParams = $.extend({}, {
               'from': dauDate,
               'to':  dauDate,
-              'type': 'unique',
-              'unit': 'day',
+              'interval': 1,
+              'type': 'unique'
             });
             var mauParams = $.extend({}, {
               'from': moment(mauStartDate).format('YYYY-MM-DD'),
               'to':  moment(mauEndDate).format('YYYY-MM-DD'),
               'interval': 30,
-              'type': 'unique',
+              'type': 'unique'
             });
             var $dau = MP.api.segment(eventName, dauParams);
             var $mau = MP.api.segment(eventName, mauParams);
