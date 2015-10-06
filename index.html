@@ -4,11 +4,6 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
-    
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jQRangeSlider/5.7.1/css/iThing.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script src="https://biojs.googlecode.com/svn-history/r487/trunk/src/main/resources/dependencies/jquery/jQRangeSlider-5.1/jQAllRangeSliders-min.js"></script>
-    
   </head>
   <body class="mixpanel-platform-body">
     <div class="mixpanel-platform-section">
@@ -18,7 +13,7 @@
         <div style="clear: both;"></div>
       </div>
       <div class="selectors">
-        <div id="slider"></div><br>
+        <div id="dateSelect" style="float: left;"></div>
         <div style="clear: both;"></div>
       </div>
       <div id="graph"></div>
@@ -26,19 +21,22 @@
     <script>
       MP.api.ready(function() {
         var eventGraph  = $('#graph').MPChart({chartType: 'line'});
-        $("#slider").dateRangeSlider({
-          formatter:function(val){var days = val.getDate(), month = val.getMonth() + 1, year = val.getFullYear();
-            return month + "/" + days + "/" + year;},
-          bounds:{min: moment().subtract(182, 'days').toDate(),max: moment().toDate()},
-          defaultValues:{min: moment().subtract(2, 'days').toDate(),max: moment().toDate()}, //changeback to 30 days
-          range:{min: {days: 1},max: {days: 100}} //{days: 7}
-        });
+        var dateSelect  = $('#dateSelect').MPDatepicker();
         
+        //convenience method for grabbing that datepicker value
+        getDates = function() {
+          return dateSelect.MPDatepicker('value')
+        }
+
+        //find interval for bar chart 'interval' param
+        getInterval = function(dates) {
+          intervalDays = Math.ceil((dates.to - dates.from) / (24 * 60 * 60 * 1000)) + 1
+          return intervalDays
+        }
         
         var runQuery = function() {
           //obtain event, property, and date range 
-          var from_date = $('#slider').dateRangeSlider("values").min,
-              to_date = $('#slider').dateRangeSlider("values").max,
+          var dateRange = dateSelect.MPDatepicker('value'),
               eventName = '$custom_event:87021';
           
           $('#graph').empty();
@@ -48,7 +46,11 @@
           console.log("START!");
           console.log(output);
           
-          for (var d = from_date; d < to_date; d.setDate(d.getDate() + 1)) {
+          var dates = getDates();
+          
+          for (var d = dates.from; d < dates.to; d.setDate(d.getDate() + 1)) {
+            debugger;
+            console
             var dauDate =  moment(d).format('YYYY-MM-DD')
 
             var mauStartDate =  new Date();
@@ -105,7 +107,7 @@
           eventGraph.MPChart('setData', output);
         };
         //actions when dropdowns change
-        $("#slider").bind("valuesChanged", runQuery);
+        dateSelect.on('change', runQuery);
       });
     </script>
     
