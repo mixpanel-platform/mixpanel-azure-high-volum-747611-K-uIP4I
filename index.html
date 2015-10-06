@@ -45,7 +45,6 @@
           
           var dates = getDates();
           
-          console.log("START!");
           console.log(output);
           
           for (var d = dates.from; d < dates.to; d.setDate(d.getDate() + 1)) {
@@ -57,9 +56,10 @@
             var mauEndDate =  new Date();
             mauEndDate.setDate(d.getDate()-1);
             
-            console.log("DAU DATE = " + d);
-            console.log("MAU DATE Start = " + mauStartDate);
-            console.log("MAU DATE End = " + mauEndDate);
+            console.log("START!")
+            console.log("DAU DATE = " + dauDate);
+            console.log("MAU DATE Start = " + moment(mauStartDate).format('YYYY-MM-DD'));
+            console.log("MAU DATE End = " + moment(mauEndDate).format('YYYY-MM-DD'));
             
             var dauParams = $.extend({}, {
               'from': dauDate,
