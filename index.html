@@ -23,93 +23,104 @@
         var eventGraph  = $('#graph').MPChart({chartType: 'line'});
         var dateSelect  = $('#dateSelect').MPDatepicker();
         
-        //convenience method for grabbing that datepicker value
+        // Convenience method for grabbing that datepicker value
         getDates = function() {
           return dateSelect.MPDatepicker('value')
         }
 
-        //find interval for bar chart 'interval' param
+        // Find interval for bar chart 'interval' param
         getInterval = function(dates) {
           intervalDays = Math.ceil((dates.to - dates.from) / (24 * 60 * 60 * 1000)) + 1
           return intervalDays
         }
         
+        // Add 1 day to date of type string
+        addOneDay = function(date) {
+          transformDate = $.datepicker.parseDate('yy-mm-dd', date);
+          transformDate.setDate(transformDate.getDate() + 1)
+          finalDate = $.datepicker.formatDate('yy-mm-dd', transformDate);
+          return finalDate
+        }
+        
         var runQuery = function() {
-          //obtain event, property, and date range 
+          // Obtain parameters 
           var dateRange = dateSelect.MPDatepicker('value'),
-              eventName = '$custom_event:87021';
+              eventName = 'App Open',
+              dates = getDates(),
+              dauOutput = {},
+              mauOutput = {},
+              promisesMAU = [];
           
           $('#graph').empty();
+          mauOutput[eventName] = {}
           
-          var output = {};
-          output["Top 10 Events"] = {};
-          
-          var dates = getDates();
-          
-          console.log(output);
-          
-          for (var d = dates.from; d < dates.to; d.setDate(d.getDate() + 1)) {
+          // Query for DAU
+          var params = $.extend({}, dates, {
+              'type': 'unique',
+              'unit': 'day'
+          });
+          MP.api.segment(eventName, params).done(function(queryResults) {
+            dauOutput = queryResults.values();
+          });
+            
+          // Query for MAU
+          for (var d = dates.from; d <= dates.to; d.setDate(d.getDate() + 1)) {
             var dauDate =  moment(d).format('YYYY-MM-DD')
+            var mauStartDate =  new Date(d);
+            mauStartDate.setDate(mauStartDate.getDate()-31);
+            var mauEndDate =  new Date(d);
+            mauEndDate.setDate(mauEndDate.getDate()-1);
             
-            var mauStartDate =  new Date();
-            mauStartDate.setDate(d.getDate()-31);
-            console.log(d.getDate()-31);
-            
-            var mauEndDate =  new Date();
-            mauEndDate.setDate(d.getDate()-1);
-            
-            console.log(d);
-            
-            console.log("START!")
-            console.log("DAU DATE = " + dauDate);
-            console.log("MAU DATE Start = " + moment(mauStartDate).format('YYYY-MM-DD'));
-            console.log("MAU DATE End = " + moment(mauEndDate).format('YYYY-MM-DD'));
-            
-            var dauParams = $.extend({}, {
-              'from': dauDate,
-              'to':  dauDate,
-              'interval': 1,
-              'type': 'unique'
-            });
-            var mauParams = $.extend({}, {
-              'from': moment(mauStartDate).format('YYYY-MM-DD'),
+            promisesMAU.push(MP.api.segment(eventName, {
+              'type': 'unique',
               'to':  moment(mauEndDate).format('YYYY-MM-DD'),
-              'interval': 30,
-              'type': 'unique'
-            });
-
-            var $dau = MP.api.segment(eventName, dauParams);
-            var $mau = MP.api.segment(eventName, mauParams);
-              
-            // Wait until the segmentation queries finish
-            $.when($dau, $mau).done(function(dau, mau) {
-              var dauQuery = dau.values()[eventName];
-              var mauQuery = mau.values()[eventName];
-              
-              if (dauQuery) {
-                // Calculating MAU
-                var sum = 0;
-                _.each(_.keys(mauQuery), function(dates){
-                  var values = mauQuery[dates];
-                  sum = sum + values;
-                });
-                if (sum == 0) {sum = 1}; 
-                
-                // Calculating DAU over MAU
-                value = dauQuery[dauDate];
-                output["Top 10 Events"][dauDate] = value/sum;
-                //console.log(output);
-              } else {
-                output["Top 10 Events"][dauDate] = 0;
-                //console.log(output);
-              };
-            
-            });
+              'from': moment(mauStartDate).format('YYYY-MM-DD'),
+              'interval': 30
+            }));
           };
-              
-          // Log and graph results
-          console.log("Final " + output)
-          eventGraph.MPChart('setData', output);
+          
+          var $mau = Promise.all(promisesMAU).then(function(promiseMauArray){
+            _.each(promiseMauArray, function(data){
+              var mauQuery = data.values()[eventName];
+              var zeroDate = new Date(0);
+              var dauDate = moment(zeroDate).format('YYYY-MM-DD');
+              var sum = 0;
+              // Calculate MAU
+              _.each(_.keys(mauQuery), function(dates){
+                var values = mauQuery[dates];
+                sum = sum + values;
+                if (dates > dauDate) {
+                  dauDate = dates;
+                };
+              });
+              if (sum == 0) {sum = 1};
+              var finalDauDate = addOneDay(dauDate)
+              mauOutput[eventName][finalDauDate] = sum;
+            });
+          }).then(function(){
+            // Calculate DAU over MAU
+            var dauResults = dauOutput[eventName];
+            var mauResults = mauOutput[eventName];
+            var finalOutput = {};
+            finalOutput["Top 10"] = {};
+            
+            if (dauOutput) {
+              _.each(_.keys(dauResults), function(date){
+                var dauValue = dauResults[date];
+                var mauValue = mauResults[date];
+                finalOutput["Top 10"][date] = dauValue/mauValue;
+              });
+            } else {
+              _.each(_.keys(mauResults), function(date){
+                finalOutput["Top 10"][date] = 0;
+              });
+            };
+            // Log and graph results
+            eventGraph.MPChart('setData', finalOutput);    
+            console.log("Dau Data" + dauOutput);
+            console.log("MAU Data" + mauOutput);
+            console.log("Final Data" + finalOutput)
+          });
         };
         //actions when dropdowns change
         dateSelect.on('change', runQuery);
