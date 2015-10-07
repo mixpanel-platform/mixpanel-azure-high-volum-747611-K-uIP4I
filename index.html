@@ -17,6 +17,7 @@
       </div>
       <div class="selectors">
         <div id="dateSelect" style="float: left;"></div>
+        <button id="run" value="Run">Run</button>
         <div style="clear: both;"></div>
       </div>
       <div id="graph"></div>
@@ -125,6 +126,7 @@
             console.log("Final Data" + finalOutput)
           });
         };
+        
         //actions when dropdowns change
         $('#run').on('click', function(e){
         //dates = $('#dateRange').val();
